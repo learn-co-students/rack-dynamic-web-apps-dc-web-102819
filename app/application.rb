@@ -1,25 +1,32 @@
 class Application
  
+  @@items = ["apples","Carrots","Pears"]
+
+  @@cart = ["Soap", "Shampoo", "Face Cleanser"]
+ 
   def call(env)
     resp = Rack::Response.new
+    req = Rack::Request.new(env)
  
-    # num_1 = Kernel.rand(1..20)
-    # num_2 = Kernel.rand(1..20)
-    # num_3 = Kernel.rand(1..20)
+    if req.path.match(/cart/)
+      @@cart.each do |cart|
+        resp.write "#{cart}\n"
+      end
+    elsif req.path.match(/add/)
  
-    # resp.write "#{num_1}\n"
-    # resp.write "#{num_2}\n"
-    # resp.write "#{num_3}\n"
-
-    resp.write Time.now.to_i
+      search_term = req.params["q"]
  
-    if Time.now.hour < 12
-      resp.write "Good Morning!"
+      if @@items.include?(search_term)
+        @@cart << search_term
+        resp.write "#{search_term} added to cart"
+      else
+        resp.write "Couldn't find #{search_term}"
+      end
+ 
     else
-      resp.write "Good Afternoon!"
+      resp.write "Path Not Found"
     end
  
     resp.finish
   end
- 
 end
